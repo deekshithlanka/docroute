@@ -1,0 +1,82 @@
+{
+  "name": "DocRoute: approved document follow-up",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "docroute-approved",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "a1c0f6a2-0001-4c1e-9d1a-000000000001",
+      "name": "Document approved",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "docroute-approved"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.body.document.total }}",
+              "rightValue": 25000,
+              "operator": { "type": "number", "operation": "gte" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1c0f6a2-0002-4c1e-9d1a-000000000002",
+      "name": "Over $25k?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.NOTIFY_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: `Large commitment approved: ${$json.body.document.vendor_name} ${$json.body.document.vendor_document_number} for $${$json.body.document.total} on job ${$json.body.document.job_number}. Update the cost forecast.` }) }}",
+        "options": {}
+      },
+      "id": "a1c0f6a2-0003-4c1e-9d1a-000000000003",
+      "name": "Alert project controls",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.NOTIFY_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: `Posted to ERP as ${$json.body.erp_id}: ${$json.body.document.vendor_name} ${$json.body.document.vendor_document_number}, job ${$json.body.document.job_number}.` }) }}",
+        "options": {}
+      },
+      "id": "a1c0f6a2-0004-4c1e-9d1a-000000000004",
+      "name": "Log to AP channel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 400]
+    }
+  ],
+  "connections": {
+    "Document approved": { "main": [[{ "node": "Over $25k?", "type": "main", "index": 0 }]] },
+    "Over $25k?": {
+      "main": [
+        [{ "node": "Alert project controls", "type": "main", "index": 0 }],
+        [{ "node": "Log to AP channel", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}
