@@ -4,8 +4,8 @@ import { routeFor } from "./routing";
 import type { DocRecord, Extraction, ModelAttempt, ValidationCheck } from "./types";
 import type { Store } from "./store";
 
-export const PRIMARY_MODEL = () => process.env.GEMINI_PRIMARY_MODEL || "gemini-3.1-flash-lite";
-export const FALLBACK_MODEL = () => process.env.GEMINI_FALLBACK_MODEL || "gemini-3.5-flash";
+export const PRIMARY_MODEL = () => process.env.GEMINI_PRIMARY_MODEL || "gemini-3-flash-preview";
+export const FALLBACK_MODEL = () => process.env.GEMINI_FALLBACK_MODEL || "gemini-3.6-flash";
 const ESCALATE_BELOW = () => Number(process.env.ESCALATION_CONFIDENCE ?? 0.8);
 
 /**

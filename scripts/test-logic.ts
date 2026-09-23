@@ -69,7 +69,7 @@ test("$31.6k change order -> CFO", () => assert.equal(routeFor(SAMPLES[2].golden
 test("submittal -> Project Engineer", () => assert.equal(routeFor(SAMPLES[3].golden).approver_role, "Project Engineer"));
 
 console.log("cost + parsing");
-test("flash-lite cost math", () => assert.equal(costUsd("gemini-3.1-flash-lite", 1_000_000, 1_000_000), 1.75));
+test("flash cost math", () => assert.equal(costUsd("gemini-3-flash-preview", 1_000_000, 1_000_000), 3.5));
 test("unknown model costs 0 rather than crashing", () => assert.equal(costUsd("mystery", 1000, 1000), 0));
 test("normalize strips $ and commas, clamps confidence", () => {
   const x = normalize({ document_type: "invoice", total: "$8,475.98", confidence: 1.4, line_items: [{ description: "x", amount: "1,158.00" }], summary: "" });
@@ -110,35 +110,35 @@ function fakeGemini(byModel: Record<string, object | number>) {
   const base = { filename: "t.pdf", source: "upload" as const, sampleId: null, pdfBase64: "AAAA", store };
   console.log("pipeline (fake Gemini)");
 
-  let calls = fakeGemini({ "gemini-3.1-flash-lite": { ...SAMPLES[0].golden, document_number: "NEW-1" } });
+  let calls = fakeGemini({ "gemini-3-flash-preview": { ...SAMPLES[0].golden, document_number: "NEW-1" } });
   let doc = await runPipeline({ ...base, id: "t1" });
   test("confident primary result is not escalated", () => {
-    assert.deepEqual(calls, ["gemini-3.1-flash-lite"]);
+    assert.deepEqual(calls, ["gemini-3-flash-preview"]);
     assert.equal(doc.escalated, false);
     assert.equal(doc.status, "ready_for_review");
     assert.equal(doc.attempts[0].output_tokens, 500);
-    assert.ok(Math.abs(doc.attempts[0].cost_usd - (2000 * 0.25 + 500 * 1.5) / 1e6) < 1e-12);
+    assert.ok(Math.abs(doc.attempts[0].cost_usd - (2000 * 0.5 + 500 * 3.0) / 1e6) < 1e-12);
   });
 
   calls = fakeGemini({
-    "gemini-3.1-flash-lite": { ...SAMPLES[0].golden, document_number: "NEW-2", confidence: 0.4 },
-    "gemini-3.5-flash": { ...SAMPLES[0].golden, document_number: "NEW-2", confidence: 0.95 },
+    "gemini-3-flash-preview": { ...SAMPLES[0].golden, document_number: "NEW-2", confidence: 0.4 },
+    "gemini-3.6-flash": { ...SAMPLES[0].golden, document_number: "NEW-2", confidence: 0.95 },
   });
   doc = await runPipeline({ ...base, id: "t2" });
   test("low confidence escalates to the fallback model", () => {
-    assert.deepEqual(calls, ["gemini-3.1-flash-lite", "gemini-3.5-flash"]);
+    assert.deepEqual(calls, ["gemini-3-flash-preview", "gemini-3.6-flash"]);
     assert.equal(doc.escalated, true);
     assert.equal(doc.extraction!.confidence, 0.95);
   });
 
-  calls = fakeGemini({ "gemini-3.1-flash-lite": { ...SAMPLES[1].golden, document_number: "NEW-3" } });
+  calls = fakeGemini({ "gemini-3-flash-preview": { ...SAMPLES[1].golden, document_number: "NEW-3" } });
   doc = await runPipeline({ ...base, id: "t3" });
   test("math errors on the document do not trigger escalation", () => {
-    assert.deepEqual(calls, ["gemini-3.1-flash-lite"]);
+    assert.deepEqual(calls, ["gemini-3-flash-preview"]);
     assert.equal(doc.status, "needs_attention");
   });
 
-  calls = fakeGemini({ "gemini-3.1-flash-lite": 503, "gemini-3.5-flash": 503 });
+  calls = fakeGemini({ "gemini-3-flash-preview": 503, "gemini-3.6-flash": 503 });
   doc = await runPipeline({ ...base, id: "t4" });
   test("5xx is retried, then the fallback is tried, then marked failed", () => {
     assert.equal(calls.length, 6); // 3 tries each

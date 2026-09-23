@@ -2,7 +2,7 @@
  * Field-level accuracy vs. cost, per model, on the hand-checked samples.
  *
  *   GEMINI_API_KEY=... npm run eval
- *   GEMINI_API_KEY=... npm run eval -- --models gemini-3.1-flash-lite,gemini-3.5-flash --runs 3
+ *   GEMINI_API_KEY=... npm run eval -- --models gemini-3-flash-preview,gemini-3.6-flash --runs 3
  *
  * Writes eval-results.json. Paste the printed table into the README.
  */
@@ -16,7 +16,7 @@ const arg = (name: string, dflt: string) => {
   const i = process.argv.indexOf(`--${name}`);
   return i > -1 ? process.argv[i + 1] : dflt;
 };
-const MODELS = arg("models", "gemini-3.1-flash-lite,gemini-3.5-flash").split(",");
+const MODELS = arg("models", "gemini-3-flash-preview,gemini-3.6-flash").split(",");
 const RUNS = Number(arg("runs", "1"));
 
 const norm = (v: unknown) => String(v ?? "").toLowerCase().replace(/[^a-z0-9.]/g, "");

@@ -14,9 +14,9 @@ AP and project-controls staff at a contractor retype hundreds of vendor document
 
 ```mermaid
 flowchart LR
-  A[PDF upload] --> B[Gemini Flash-Lite<br/>structured JSON]
+  A[PDF upload] --> B[Gemini 3 Flash Preview<br/>structured JSON]
   B --> C{Confident and<br/>complete?}
-  C -- no --> D[Gemini Flash<br/>re-read]
+  C -- no --> D[Gemini 3.6 Flash<br/>re-read]
   C -- yes --> E[Validation rules]
   D --> E
   E --> F[Approval routing<br/>by type and amount]
@@ -27,7 +27,7 @@ flowchart LR
 ```
 
 1. **Extract.** The PDF goes straight to Gemini with a JSON response schema, so the model can only answer in the exact structure the app expects. No PDF-parsing library, no parsing of free text.
-2. **Escalate only when needed.** `gemini-3.1-flash-lite` reads every document first. If it reports low confidence or misses required fields, `gemini-3.5-flash` re-reads it. Math errors printed on the document do not trigger escalation, because re-reading a wrong invoice doesn't make it right. That's a cost decision, and there's a test for it.
+2. **Escalate only when needed.** `gemini-3-flash-preview` reads every document first. If it reports low confidence or misses required fields, `gemini-3.6-flash` re-reads it. Math errors printed on the document do not trigger escalation, because re-reading a wrong invoice doesn't make it right. That's a cost decision, and there's a test for it.
 3. **Validate.** Eight rules: required fields, job exists and is open, each line's qty times price, lines sum to subtotal, subtotal plus tax equals total, duplicate vendor and invoice number, due date after invoice date, and model confidence. Any value that fails a check is highlighted in the review screen.
 4. **Route.** Submittals go to the Project Engineer. Invoices and change orders go to the Project Manager (under $5k), Operations Manager ($5k–$25k), or CFO (over $25k). Edit `lib/routing.ts` to match a real delegation-of-authority policy.
 5. **Decide.** Approving a flagged document requires a note. Rejecting always requires one.
@@ -42,8 +42,8 @@ Every model call records input and output tokens (thinking tokens bill as output
 <!-- Paste the table printed by `npm run eval` here -->
 | Model | Field accuracy | Docs fully correct | Cost / doc | p50 latency |
 |---|---|---|---|---|
-| gemini-3.1-flash-lite | _run eval_ | | | |
-| gemini-3.5-flash | _run eval_ | | | |
+| gemini-3-flash-preview | _run eval_ | | | |
+| gemini-3.6-flash | _run eval_ | | | |
 
 Four documents is a smoke test, not a benchmark. Next step: 30+ real-world-style documents including scans, photos, and multi-page invoices.
 
