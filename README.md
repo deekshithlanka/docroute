@@ -1,10 +1,24 @@
+<div align="center">
+
 # DocRoute
 
-AI document intake for a construction contractor's back office. Upload a supplier invoice, change order, or submittal as a PDF. DocRoute reads it with Gemini, checks the math and the job number against the ERP, routes it to the right approver, and on approval posts it to the ERP and notifies the team.
+**AI document intake for construction back offices.** Upload a supplier invoice, change order, or submittal as a PDF. DocRoute reads it with Gemini, checks the math and the job number against the ERP, routes it to the right approver, and on approval posts it to the ERP and notifies the team.
 
-**Live demo:** https://YOUR-APP.vercel.app  <!-- replace after deploying -->
+<!-- After deploying: put your Vercel URL in the badge below and remove these comment markers.
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_App-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://YOUR-APP.vercel.app)
+-->
+[![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)](https://ai.google.dev)
 
-![DocRoute document review](docs/screenshot.png) <!-- add after deploying -->
+<!-- After deploying: save a screenshot as docs/screenshot.png and remove these comment markers.
+<br />
+<img src="docs/screenshot.png" alt="DocRoute review screen showing extracted invoice fields, validation flags, and approval routing" width="900" />
+
+<sub>Review screen: extracted fields, failed validation checks highlighted, and the routed approver.</sub>
+-->
+
+</div>
 
 ## Why this exists
 
